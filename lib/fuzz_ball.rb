@@ -1,9 +1,15 @@
+require File.join(File.dirname(__FILE__), '../ext/fuzz_ball/count_duples')
+
 class FuzzBall
 
-  attr_reader :files
+
+  include CountDuples
+
+  attr_reader :files, :files_array
 
   def initialize(files)
     @files = files
+    @files_array = files.collect {|f| f.unpack("U*")}
   end
 
   def search(term)
