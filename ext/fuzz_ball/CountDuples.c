@@ -9,7 +9,7 @@ VALUE method_count_duples(VALUE self, VALUE needle, VALUE haystack);
 // The initialization method for this module
 void Init_count_duples() {
   CountDuples = rb_define_module("CountDuples");
-  rb_define_method(CountDuples, "count_duples", method_count_duples, 2);
+  rb_define_private_method(CountDuples, "count_duples", method_count_duples, 2);
 }
 
 /* count_duples(needle, haystack)
