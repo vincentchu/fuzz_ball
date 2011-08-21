@@ -1,9 +1,9 @@
-require File.join(File.dirname(__FILE__), '../ext/fuzz_ball/count_duples')
+require File.join(File.dirname(__FILE__), '../ext/fuzz_ball/array_methods')
 
 class FuzzBall
 
 
-  include CountDuples
+  include ArrayMethods
 
   attr_reader :files, :files_array
 

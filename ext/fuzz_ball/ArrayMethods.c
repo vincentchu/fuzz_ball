@@ -2,14 +2,14 @@
 #include "ruby.h"
 
 // Prototype some shit
-VALUE CountDuples = Qnil;
-void Init_count_duples();
+VALUE ArrayMethods = Qnil;
+void Init_array_methods();
 VALUE method_count_duples(VALUE self, VALUE needle, VALUE haystack);
 
 // The initialization method for this module
-void Init_count_duples() {
-  CountDuples = rb_define_module("CountDuples");
-  rb_define_private_method(CountDuples, "count_duples", method_count_duples, 2);
+void Init_array_methods() {
+  ArrayMethods = rb_define_module("ArrayMethods");
+  rb_define_private_method(ArrayMethods, "count_duples", method_count_duples, 2);
 }
 
 /* count_duples(needle, haystack)
