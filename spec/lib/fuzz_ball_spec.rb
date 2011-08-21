@@ -2,11 +2,11 @@ require 'spec_helper'
 
 describe FuzzBall do
 
-  describe "#initialize" do
-    before(:all) do
-      @fuzz = FuzzBall.new(["aaa", "bbb"])
-    end
+  before(:all) do
+    @fuzz = FuzzBall.new(["aaa", "bbb"])
+  end
 
+  describe "#initialize" do
     it "should initialize with a list of files" do
       @fuzz.files.should == ["aaa", "bbb"] 
     end
@@ -21,21 +21,23 @@ describe FuzzBall do
   end
 
   describe "Array utilities" do
-    before(:all) do
-      @fuzz = FuzzBall.new( %w(aaa bbb) )
-    end
-
     describe "#count_duples" do
-      it "should return the number of continuous duples in a string" do
-        puts @fuzz.count_duples([1]).inspect
+      it "should return the number of continuous duples between two arrays" do
 
+        [
+          [[1,2], [1,3], 0],
+          [[1,2,3], [5,6,1,2,3,4], 2],
+          [[1,2], [1,2], 1],
+          [[1,2,3], [1,2], 1]
+        ].each do |test_case|
+          @fuzz.count_duples(test_case[0], test_case[1]).should == test_case[2]
+        end
       end
     end
   end
 
   describe "String utilities" do
     before(:all) do
-      @fuzz = FuzzBall.new( %w(aaa bbb) )
       @str  = "lorem ipsum dolor"
       @arr  = @str.unpack("U*")
     end

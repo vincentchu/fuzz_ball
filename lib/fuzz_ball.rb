@@ -9,7 +9,7 @@ class FuzzBall
 
   def initialize(files)
     @files = files
-    @files_array = files.collect {|f| f.unpack("U*")}
+    @files_array = files.collect {|f| str2arr(f)}
   end
 
   def search(term)
