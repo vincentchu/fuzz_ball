@@ -23,6 +23,12 @@ describe FuzzBall do
       @fuzz.should_receive(:smith_waterman).once.with(@aaa_array, @aaa_array)
       @fuzz.search("aaa")
     end
+
+    it "should be fine when presented with malformed input (e.g., blank string)" do
+      lambda {
+        @fuzz.search("")
+      }.should_not raise_exception
+    end
   end
 
   describe "#decimate_strings!" do

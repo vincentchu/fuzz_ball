@@ -16,10 +16,12 @@ class FuzzBall
     @curr_score     = 0.0
   end
 
-  def search(term)
+  def search(term, opts = {})
 
     term_ary = str2arr(term)
     results  = []
+
+    return results if term.empty?
 
     decimate_strings!( term_ary ).each do |candidate|
       smith_waterman(term_ary, candidate)
@@ -27,7 +29,13 @@ class FuzzBall
       results << {:alignment => @curr_alignment, :score => @curr_score, :string => candidate.pack("U*")}
     end
 
-    results.sort_by! {|r| r[:score]}
+    if (opts[:order] == :descending)
+      results.sort! {|a,b| b[:score] <=> a[:score]}
+    else
+      results.sort! {|a,b| a[:score] <=> b[:score]}
+    end
+
+    results = results.first(opts[:limit]) if opts[:limit].is_a?(Fixnum)
 
     results
   end
