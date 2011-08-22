@@ -1,15 +1,133 @@
 // Include the Ruby headers and goodies
 #include "ruby.h"
 
+#define SCORE_INSERT -0.1
+#define SCORE_DELETE -1.0
+#define SCORE_MISS   -1.0
+#define SCORE_MATCH   2.0
+
+
+
 // Prototype some shit
 VALUE ArrayMethods = Qnil;
 void Init_array_methods();
 VALUE method_count_duples(VALUE self, VALUE needle, VALUE haystack);
+VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate);
+
+void assign_cells(double **mat, int *needle, int *candidate, int n_needle, int n_candidate, int *i_max, int *j_max, double *max_score);
+void alloc_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate);
+void free_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate);
+void max_of4(double arg1, double arg2, double arg3, double arg4);
+
 
 // The initialization method for this module
 void Init_array_methods() {
   ArrayMethods = rb_define_module("ArrayMethods");
   rb_define_private_method(ArrayMethods, "count_duples", method_count_duples, 2);
+  rb_define_private_method(ArrayMethods, "smith_waterman", method_smith_waterman, 2);
+}
+
+double max_of(double arg1, double arg2, double arg3, double arg4) {
+
+  double max_val = -10000.0;
+
+  if (arg1 > max_val)
+    max_val = arg1;
+
+  if (arg2 > max_val)
+    max_val = arg2;
+
+  if (arg3 > max_val)
+    max_val = arg3;
+
+  if (arg4 > max_val)
+    max_val = arg4;
+
+  return max_val;
+}
+
+void alloc_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate) {
+  int i;
+
+  *mat = malloc(n_needle * sizeof(double *));
+  for (i=0; i<n_needle; i++) {
+    *((*mat) + i) = malloc(n_candidate * sizeof(double));
+  }
+
+  *needle = malloc(n_needle * sizeof(int));
+  *candidate = malloc(n_candidate * sizeof(int));
+}
+
+void free_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate) {
+
+  int i, j;
+
+  free(*needle);    *needle = NULL;
+  free(*candidate); *candidate = NULL;
+
+  for (i=0; i<n_needle; i++) {
+    free( (*mat)[i] );
+  }
+  free( *mat );
+  *mat = NULL;
+}
+
+VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate) {
+  int i, j, i_max, j_max;
+  int n_needle    = (int) RARRAY_LEN(needle);
+  int n_candidate = (int) RARRAY_LEN(candidate);
+  int *c_needle, *c_candidate;
+
+  double max_score;
+  double **mat;
+
+  alloc_vars(&mat, &c_needle, &c_candidate, n_needle, n_candidate);
+
+  for (i=0; i<n_needle; i++)
+    c_needle[i] = NUM2INT( RARRAY_PTR(needle)[i] );
+
+  for (i=0; i<n_candidate; i++)
+    c_candidate[i] = NUM2INT( RARRAY_PTR(candidate)[i] );
+
+  assign_cells(mat, c_needle, c_candidate, n_needle, n_candidate, &i_max, &j_max, &max_score);
+
+  printf("imax, jmax = %d, %d - max_score = %f\n", i_max, j_max, max_score);
+
+
+
+  free_vars(&mat, &c_needle, &c_candidate, n_needle, n_candidate);
+  return Qtrue; 
+}
+
+void assign_cells(double **mat, int *needle, int *candidate, int n_needle, int n_candidate, int *i_max, int *j_max, double *max_score) {
+  int i, j;
+  double score, value;
+
+  for (i=0; i<n_needle; i++) {
+    for (j=0; j<n_candidate; j++) {
+      mat[i][j] = 0.0;
+    }
+  }
+
+  *max_score = -10000.0;
+  for (i=1; i<n_needle; i++) {
+    for (j=1; j<n_candidate; j++) {
+      if (needle[i-1] == candidate[j-1]) {
+        score = SCORE_MATCH;
+      } else {
+        score = SCORE_MISS;
+      }
+
+      value = max_of(0.0, mat[i-1][j-1] + score, mat[i-1][j] + SCORE_DELETE, mat[i][j-1] + SCORE_INSERT);
+      mat[i][j] = value;
+
+      if (value > *max_score) {
+        *max_score = value;
+        *i_max     = i;
+        *j_max     = j;
+      }
+    }
+  }
 }
 
 /* count_duples(needle, haystack)

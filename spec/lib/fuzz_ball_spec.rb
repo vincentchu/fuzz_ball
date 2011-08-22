@@ -20,6 +20,13 @@ describe FuzzBall do
     it "should allow you to search for a file within the list"
   end
 
+  describe "#decimate_strings!" do
+    it "should remove strings that don't have a high duple count" do
+      aaa_array = "aaa".unpack("U*")
+      @fuzz.send(:decimate_strings!, aaa_array).should == [aaa_array]
+    end
+  end
+
   describe "Array utilities" do
     describe "#count_duples" do
       it "should return the number of continuous duples between two arrays" do
@@ -34,11 +41,11 @@ describe FuzzBall do
       end
     end
 
-    describe "#decimate_strings!" do
-      it "should remove strings that don't have a high duple count" do
-        aaa_array = "aaa".unpack("U*")
-        @fuzz.send(:decimate_strings!, aaa_array).should == [aaa_array]
+    describe "#iterate_over_cells!" do
+      it "should assign cells into the smith-waterman matrix" do
+        puts "XXXX " + @fuzz.send(:smith_waterman, [1,2,3], [2,3,4]).inspect
       end
+
     end
   end
 

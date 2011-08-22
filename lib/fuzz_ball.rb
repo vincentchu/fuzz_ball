@@ -1,15 +1,18 @@
 require File.join(File.dirname(__FILE__), '../ext/fuzz_ball/array_methods')
+require 'fuzz_ball/string_align'
 
 class FuzzBall
 
-
   include ArrayMethods
+  include StringAlign
 
   attr_reader :files, :files_array
 
   def initialize(files)
     @files = files
     @files_array = files.collect {|f| str2arr(f)}
+
+    @tmp_align = []
   end
 
   def search(term)
@@ -40,9 +43,4 @@ class FuzzBall
   def arr2str( arr )
     arr.pack("U*")
   end
-
-  def winnow!(term)
-
-  end
-
 end
