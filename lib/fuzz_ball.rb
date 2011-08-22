@@ -1,10 +1,8 @@
 require File.join(File.dirname(__FILE__), '../ext/fuzz_ball/array_methods')
-require 'fuzz_ball/string_align'
 
 class FuzzBall
 
   include ArrayMethods
-  include StringAlign
 
   attr_reader :files, :files_array
 
@@ -16,15 +14,15 @@ class FuzzBall
     @curr_score     = 0.0
   end
 
-  def search(term, opts = {})
+  def search(needle, opts = {})
 
-    term_ary = str2arr(term)
+    needle_ary = str2arr(needle)
     results  = []
 
-    return results if term.empty?
+    return results if (needle.length < 2)
 
-    decimate_strings!( term_ary ).each do |candidate|
-      smith_waterman(term_ary, candidate)
+    decimate_strings!( needle_ary ).each do |candidate|
+      smith_waterman(needle_ary, candidate)
 
       results << {:alignment => @curr_alignment, :score => @curr_score, :string => candidate.pack("U*")}
     end
