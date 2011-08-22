@@ -19,7 +19,8 @@ describe FuzzBall do
 
   describe "#search" do
     it "should only search the candidate strings that have the highest duples" do
-      @fuzz.should_receive(:decimate_strings!).once.with( @aaa_array ).and_return(@aaa_array)
+      @fuzz.should_receive(:decimate_strings!).once.with( @aaa_array ).and_return([@aaa_array])
+      @fuzz.should_receive(:smith_waterman).once.with(@aaa_array, @aaa_array)
       @fuzz.search("aaa")
     end
   end

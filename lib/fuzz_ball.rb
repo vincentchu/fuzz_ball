@@ -19,10 +19,17 @@ class FuzzBall
   def search(term)
 
     term_ary = str2arr(term)
+    results  = []
 
     decimate_strings!( term_ary ).each do |candidate|
+      smith_waterman(term_ary, candidate)
 
+      results << {:alignment => @curr_alignment, :score => @curr_score, :string => candidate.pack("U*")}
     end
+
+    results.sort_by! {|r| r[:score]}
+
+    results
   end
 
   private
