@@ -4,6 +4,7 @@ describe FuzzBall do
 
   before(:all) do
     @fuzz = FuzzBall.new(["aaa", "bbb"])
+    @aaa_array = "aaa".unpack("U*")
   end
 
   describe "#initialize" do
@@ -17,13 +18,15 @@ describe FuzzBall do
   end
 
   describe "#search" do
-    it "should allow you to search for a file within the list"
+    it "should only search the candidate strings that have the highest duples" do
+      @fuzz.should_receive(:decimate_strings!).once.with( @aaa_array ).and_return(@aaa_array)
+      @fuzz.search("aaa")
+    end
   end
 
   describe "#decimate_strings!" do
     it "should remove strings that don't have a high duple count" do
-      aaa_array = "aaa".unpack("U*")
-      @fuzz.send(:decimate_strings!, aaa_array).should == [aaa_array]
+      @fuzz.send(:decimate_strings!, @aaa_array).should == [@aaa_array]
     end
   end
 
@@ -41,11 +44,12 @@ describe FuzzBall do
       end
     end
 
-    describe "#iterate_over_cells!" do
-      it "should assign cells into the smith-waterman matrix" do
-        puts "XXXX " + @fuzz.send(:smith_waterman, [1,2,3], [2,3,4]).inspect
+    describe "#smith_waterman" do
+      it "should align the two strings" do 
+        @fuzz.send(:smith_waterman, [1,2,3], [2,3,4])
+        @fuzz.instance_eval { @curr_alignment }.should == [2, 1, 1, 0]
+        @fuzz.instance_eval { @curr_score }.should == 2.0
       end
-
     end
   end
 

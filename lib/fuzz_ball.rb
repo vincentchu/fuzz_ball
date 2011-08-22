@@ -12,11 +12,17 @@ class FuzzBall
     @files = files
     @files_array = files.collect {|f| str2arr(f)}
 
-    @tmp_align = []
+    @curr_alignment = []
+    @curr_score     = 0.0
   end
 
   def search(term)
 
+    term_ary = str2arr(term)
+
+    decimate_strings!( term_ary ).each do |candidate|
+
+    end
   end
 
   private

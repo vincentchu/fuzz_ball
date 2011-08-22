@@ -6,8 +6,6 @@
 #define SCORE_MISS   -1.0
 #define SCORE_MATCH   2.0
 
-
-
 // Prototype some shit
 VALUE ArrayMethods = Qnil;
 void Init_array_methods();
@@ -15,10 +13,13 @@ VALUE method_count_duples(VALUE self, VALUE needle, VALUE haystack);
 VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate);
 
 void assign_cells(double **mat, int *needle, int *candidate, int n_needle, int n_candidate, int *i_max, int *j_max, double *max_score);
+void recurse_optimal_path(double **mat, int i, int j, VALUE alignment);
 void alloc_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate);
 void free_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate);
-void max_of4(double arg1, double arg2, double arg3, double arg4);
 
+double max(double a, double b);
+double max3(double a, double b, double c);
+double max4(double a, double b, double c, double d);
 
 // The initialization method for this module
 void Init_array_methods() {
@@ -27,40 +28,45 @@ void Init_array_methods() {
   rb_define_private_method(ArrayMethods, "smith_waterman", method_smith_waterman, 2);
 }
 
-double max_of(double arg1, double arg2, double arg3, double arg4) {
-
-  double max_val = -10000.0;
-
-  if (arg1 > max_val)
-    max_val = arg1;
-
-  if (arg2 > max_val)
-    max_val = arg2;
-
-  if (arg3 > max_val)
-    max_val = arg3;
-
-  if (arg4 > max_val)
-    max_val = arg4;
-
-  return max_val;
+// A few convenience methods for determining the max of 2, 3, and 4 doubles
+double max(double a, double b) {
+  return ( (a > b) ? a : b );
 }
 
+double max3(double a, double b, double c) {
+  return max(a, max(b, c));
+}
+
+double max4(double a, double b, double c, double d) {
+  return max(a, max3(b, c, d));
+}
+
+/* alloc_vars
+ *
+ * A simple function that allocates memory for the alignment matrix, as well
+ * as the arrays that store the characters of the needle and candidate strings
+ * given their lengths.
+*/
 void alloc_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate) {
   int i;
 
   *mat = malloc(n_needle * sizeof(double *));
   for (i=0; i<n_needle; i++) {
-    *((*mat) + i) = malloc(n_candidate * sizeof(double));
+    *((*mat) + i) = malloc(n_candidate * sizeof(double)); // ptr arithmetic FTW
   }
 
   *needle = malloc(n_needle * sizeof(int));
   *candidate = malloc(n_candidate * sizeof(int));
 }
 
+/* free_vars
+ *
+ * The method that frees memory associated with the alignment matrix, and the 
+ * needle and candidate strings.
+*/
 void free_vars(double ***mat, int **needle, int **candidate, int n_needle, int n_candidate) {
 
-  int i, j;
+  int i;
 
   free(*needle);    *needle = NULL;
   free(*candidate); *candidate = NULL;
@@ -72,6 +78,40 @@ void free_vars(double ***mat, int **needle, int **candidate, int n_needle, int n
   *mat = NULL;
 }
 
+void recurse_optimal_path(double **mat, int i, int j, VALUE alignment) {
+  int ii, jj;
+  double max_value;
+
+  // Push current position of the alignment into the array that stores it.
+  rb_ary_push(alignment, INT2NUM(i));
+  rb_ary_push(alignment, INT2NUM(j));
+
+  max_value = max3(mat[i-1][j-1], mat[i-1][j], mat[i][j-1]);
+
+  if (max_value == mat[i-1][j]) {
+    ii = i-1;
+    jj = j;
+  }
+
+  if (max_value == mat[i][j-1]) {
+    ii = i;
+    jj = j-1;
+  }
+
+  if (max_value == mat[i-1][j-1]) {
+    ii = i-1;
+    jj = j-1;
+  }
+  
+  // The recursive loop. If we reach an edge (i.e., m(i,j) == 0), then stop
+  // the recursion. Otherwise, keep going!
+  if (mat[i][j] == 0) {
+    return;
+  } else {
+    return recurse_optimal_path(mat, ii, jj, alignment);
+  }
+}
+
 VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate) {
   int i, j, i_max, j_max;
   int n_needle    = (int) RARRAY_LEN(needle);
@@ -80,6 +120,8 @@ VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate) {
 
   double max_score;
   double **mat;
+
+  VALUE alignment = rb_ary_new(); 
 
   alloc_vars(&mat, &c_needle, &c_candidate, n_needle, n_candidate);
 
@@ -90,10 +132,10 @@ VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate) {
     c_candidate[i] = NUM2INT( RARRAY_PTR(candidate)[i] );
 
   assign_cells(mat, c_needle, c_candidate, n_needle, n_candidate, &i_max, &j_max, &max_score);
-
-  printf("imax, jmax = %d, %d - max_score = %f\n", i_max, j_max, max_score);
-
-
+  recurse_optimal_path(mat, i_max, j_max, alignment);
+  
+  rb_iv_set(self, "@curr_alignment", alignment);
+  rb_iv_set(self, "@curr_score", DBL2NUM(max_score));
 
   free_vars(&mat, &c_needle, &c_candidate, n_needle, n_candidate);
   return Qtrue; 
@@ -118,7 +160,7 @@ void assign_cells(double **mat, int *needle, int *candidate, int n_needle, int n
         score = SCORE_MISS;
       }
 
-      value = max_of(0.0, mat[i-1][j-1] + score, mat[i-1][j] + SCORE_DELETE, mat[i][j-1] + SCORE_INSERT);
+      value = max4(0.0, mat[i-1][j-1] + score, mat[i-1][j] + SCORE_DELETE, mat[i][j-1] + SCORE_INSERT);
       mat[i][j] = value;
 
       if (value > *max_score) {
