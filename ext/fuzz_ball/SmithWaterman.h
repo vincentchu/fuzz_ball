@@ -4,10 +4,10 @@
 #define SCORE_MATCH   2.0
 
 // Prototype some shit
-VALUE ArrayMethods = Qnil;
-void Init_array_methods();
-VALUE method_count_duples(VALUE self, VALUE needle, VALUE haystack);
-VALUE method_smith_waterman(VALUE self, VALUE needle, VALUE candidate);
+VALUE FuzzBall = Qnil;
+VALUE SmithWaterman = Qnil;
+void Init_smith_waterman();
+VALUE method_initialize(VALUE self, VALUE needle, VALUE candidate);
 
 void assign_cells(double **mat, int *needle, int *candidate, int n_needle, int n_candidate, int *i_max, int *j_max, double *max_score);
 void recurse_optimal_path(double **mat, int i, int j, VALUE alignment);

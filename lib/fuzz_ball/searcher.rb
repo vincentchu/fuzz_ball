@@ -1,8 +1,6 @@
 module FuzzBall
   class Searcher
 
-    include ArrayMethods
-
     attr_reader :files, :files_array, :options
 
     def initialize(files, opts = {})
