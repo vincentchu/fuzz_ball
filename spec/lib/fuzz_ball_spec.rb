@@ -9,11 +9,16 @@ describe FuzzBall do
 
   describe "#initialize" do
     it "should initialize with a list of files" do
-      @fuzz.files.should == ["aaa", "bbb"] 
+      @fuzz.files.should == ["aaa", "bbb"]
     end
 
     it "should convert the list of files into their array representations" do
       @fuzz.files_array.should == ["aaa".unpack("U*"), "bbb".unpack("U*")]
+    end
+
+    it "should weed out characters that are designated to be ignored" do
+      fuzz = FuzzBall.new(["path/to/file.txt"], :ignore => %w(. /))
+      fuzz.files_array.should == ["pathtofiletxt".unpack("U*")]
     end
   end
 
@@ -52,7 +57,7 @@ describe FuzzBall do
     end
 
     describe "#smith_waterman" do
-      it "should align the two strings" do 
+      it "should align the two strings" do
         @fuzz.send(:smith_waterman, [1,2,3], [2,3,4])
         @fuzz.instance_eval { @curr_alignment }.should == [2, 1, 1, 0]
         @fuzz.instance_eval { @curr_score }.should == 2.0

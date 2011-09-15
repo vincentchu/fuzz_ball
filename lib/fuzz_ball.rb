@@ -4,10 +4,11 @@ class FuzzBall
 
   include ArrayMethods
 
-  attr_reader :files, :files_array
+  attr_reader :files, :files_array, :options
 
-  def initialize(files)
-    @files = files
+  def initialize(files, opts = {})
+    @options     = opts
+    @files       = files
     @files_array = files.collect {|f| str2arr(f)}
 
     @curr_alignment = []
@@ -56,7 +57,17 @@ class FuzzBall
   end
 
   def str2arr( str )
-    str.unpack("U*")
+    if options[:ignore]
+
+      regexp = options[:ignore].collect { |s|
+        Regexp.escape(s)
+      }.join("|")
+
+      regexp = Regexp.new("(#{regexp})")
+      str.gsub(regexp, "").unpack("U*")
+    else
+      str.unpack("U*")
+    end
   end
 
   def arr2str( arr )
