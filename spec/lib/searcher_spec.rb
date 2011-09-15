@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe FuzzBall do
+describe FuzzBall::Searcher do
 
   before(:all) do
-    @fuzz = FuzzBall.new(["aaa", "bbb"])
+    @fuzz = FuzzBall::Searcher.new(["aaa", "bbb"])
     @aaa_array = "aaa".unpack("U*")
   end
 
@@ -17,7 +17,7 @@ describe FuzzBall do
     end
 
     it "should weed out characters that are designated to be ignored" do
-      fuzz = FuzzBall.new(["path/to/file.txt"], :ignore => %w(. /))
+      fuzz = FuzzBall::Searcher.new(["path/to/file.txt"], :ignore => %w(. /))
       fuzz.files_array.should == ["pathtofiletxt".unpack("U*")]
     end
   end

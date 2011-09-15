@@ -12,7 +12,7 @@ require File.join(File.dirname(__FILE__), 'support')
 # instance from the files
 files   = File.open("filelist", "r")  {|f| f.readlines}.collect(&:chomp)
 n_files = files.count
-fuzz    = FuzzBall.new( files )
+fuzz    = FuzzBall::Searcher.new( files )
 
 clear_screen!
 needle = ""
