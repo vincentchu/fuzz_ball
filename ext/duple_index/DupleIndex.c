@@ -10,6 +10,7 @@ void Init_duple_index() {
 
   rb_define_alloc_func(DupleIndex, method_alloc_index);
   rb_define_method(DupleIndex, "add", method_add, 2);
+  rb_define_method(DupleIndex, "query", method_query, 2);
 }
 
 VALUE method_alloc_index(VALUE self) {
@@ -44,7 +45,63 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
     c_a = NUM2INT( RARRAY_PTR(r_str)[i] );
     c_b = NUM2INT( RARRAY_PTR(r_str)[i+1] );
     add_duple(dp->duples, c_a, c_b, str_id, i);
+
+    struct duples_hash *foo;
+    long int foo_id;
+
+    foo_id = duple_id(c_a, c_b);
+    HASH_FIND_INT(dp->duples, &foo_id, foo);
+
+    if (foo == NULL) {
+      printf("YYY %d (%d, %d) MISS\n", foo_id, c_a, c_b);
+    } else {
+      printf("yyy %d (%d, %d) HIT\n", foo_id, c_a, c_b);
+    }
+
+
+
   }
+
+
+  return Qtrue;
+}
+
+VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
+  printf("\n\n**** method_query\n");
+  struct duples_hash *ptr;
+  struct duple_pos *pos;
+  struct duple_store *dp;
+  int c_a, c_b;
+
+  Data_Get_Struct(self, struct duple_store, dp);
+
+  c_a = NUM2INT( r_a );
+  c_b = NUM2INT( r_b );
+
+  printf("---%d %d\n", c_a, c_b);
+
+  ptr = duple_at(dp->duples, c_a, c_b);
+  pos = ptr->strings;
+
+
+  if (ptr == NULL) {
+    printf("NULL\n");
+  } else {
+    printf("NOT NULL\n");
+  }
+
+
+
+
+  /*  while(1) {*/
+
+  /*   printf("duple (%3d, %3d) found in string %5d at position %5d\n", c_a, c_b, pos->index, pos->pos);*/
+
+  /*   if (pos->next == NULL)*/
+  /*     break;*/
+
+  /*   pos = pos->next;*/
+  /* }*/
 
   return Qtrue;
 }
@@ -84,6 +141,18 @@ void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos)
     d_pos              = create_duple_pos(index, pos, ptr->strings, NULL);
     ptr->strings->prev = d_pos;
     ptr->strings       = d_pos;
+  }
+
+  struct duples_hash *foo;
+  int foo_id;
+
+  foo_id = duple_id(c_a, c_b);
+  HASH_FIND_INT(duples, &foo_id, foo);
+
+  if (foo == NULL) {
+    printf("XXX %d (%d, %d) MISS\n", foo_id, c_a, c_b);
+  } else {
+    printf("XXX %d (%d, %d) HIT\n", foo_id, c_a, c_b);
   }
 
 
