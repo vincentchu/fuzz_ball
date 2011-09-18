@@ -19,9 +19,7 @@ struct duples_hash {
   UT_hash_handle hh;
 };
 
-struct duple_store {
-  struct duples_hash *duples;
-};
+struct duples_hash *duples = NULL;
 
 // Ruby-related declarations
 VALUE FuzzBall   = Qnil;
@@ -34,7 +32,7 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str);
 VALUE method_query(VALUE self, VALUE r_a, VALUE r_b);
 
 // Internally-used C-declarations
-void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos);
-struct duples_hash *duple_at(struct duples_hash *duples, int c_a, int c_b);
+void add_duple(int c_a, int c_b, int index, int pos);
+struct duples_hash *duple_at(int c_a, int c_b);
 int duple_id(int c_a, int c_b);
 struct duple_pos *create_duple_pos(int index, int pos, struct duple_pos *next, struct duple_pos *prev);

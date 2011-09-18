@@ -15,13 +15,8 @@ void Init_duple_index() {
 
 VALUE method_alloc_index(VALUE self) {
   printf("\n\n**** method_alloc_index\n");
-  struct duple_store *dp;
-
-  n_malloc_calls++;
-  dp = malloc( sizeof(struct duple_store) );
-  dp->duples = NULL;
-
-  return Data_Wrap_Struct(self, NULL, method_free_index, dp);
+  int *derp;
+  return Data_Wrap_Struct(self, NULL, method_free_index, derp);
 }
 
 VALUE method_free_index(VALUE self) {
@@ -33,10 +28,7 @@ VALUE method_free_index(VALUE self) {
 
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   printf("\n\n**** method_add\n");
-  struct duple_store *dp;
   int i, str_id, str_len, c_a, c_b;
-
-  Data_Get_Struct(self, struct duple_store, dp);
 
   str_len = (int) RARRAY_LEN(r_str);
   str_id  = NUM2INT( r_str_id );
@@ -44,22 +36,19 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   for (i=0; i<(str_len-1); i++) {
     c_a = NUM2INT( RARRAY_PTR(r_str)[i] );
     c_b = NUM2INT( RARRAY_PTR(r_str)[i+1] );
-    add_duple(dp->duples, c_a, c_b, str_id, i);
+    add_duple(c_a, c_b, str_id, i);
 
     struct duples_hash *foo;
     long int foo_id;
 
     foo_id = duple_id(c_a, c_b);
-    HASH_FIND_INT(dp->duples, &foo_id, foo);
+    HASH_FIND_INT(duples, &foo_id, foo);
 
     if (foo == NULL) {
       printf("YYY %d (%d, %d) MISS\n", foo_id, c_a, c_b);
     } else {
       printf("yyy %d (%d, %d) HIT\n", foo_id, c_a, c_b);
     }
-
-
-
   }
 
 
@@ -70,19 +59,15 @@ VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
   printf("\n\n**** method_query\n");
   struct duples_hash *ptr;
   struct duple_pos *pos;
-  struct duple_store *dp;
   int c_a, c_b;
-
-  Data_Get_Struct(self, struct duple_store, dp);
 
   c_a = NUM2INT( r_a );
   c_b = NUM2INT( r_b );
 
   printf("---%d %d\n", c_a, c_b);
 
-  ptr = duple_at(dp->duples, c_a, c_b);
+  ptr = duple_at(c_a, c_b);
   pos = ptr->strings;
-
 
   if (ptr == NULL) {
     printf("NULL\n");
@@ -110,7 +95,7 @@ int duple_id(int c_a, int c_b) {
  return c_b + (c_a % MAX_CHARS) * MAX_CHARS;
 }
 
-struct duples_hash *duple_at(struct duples_hash *duples, int c_a, int c_b) {
+struct duples_hash *duple_at(int c_a, int c_b) {
   int d_id;
   struct duples_hash *d;
 
@@ -120,11 +105,11 @@ struct duples_hash *duple_at(struct duples_hash *duples, int c_a, int c_b) {
   return d;
 }
 
-void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos) {
+void add_duple(int c_a, int c_b, int index, int pos) {
   struct duples_hash *ptr;
   struct duple_pos *d_pos;
 
-  ptr = duple_at(duples, c_a, c_b);
+  ptr = duple_at(c_a, c_b);
   if (ptr == NULL) {
     printf("duple %5d (%3d, %3d) MISS!\n", duple_id(c_a, c_b), c_a, c_b);
 
