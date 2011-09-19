@@ -59,6 +59,8 @@ VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
   struct duples_hash *duples, *ptr;
   struct duple_pos *pos;
   int c_a, c_b;
+  VALUE query_raw = rb_ary_new();
+  VALUE entry;
 
   Data_Get_Struct(self, struct duples_hash, duples);
 
@@ -73,6 +75,12 @@ VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
 
       printf("duple (%3d, %3d) found in string %5d at position %5d\n", c_a, c_b, pos->index, pos->pos);
 
+      entry = rb_ary_new2(2);
+      rb_ary_store(entry, 0, INT2NUM( pos->index ));
+      rb_ary_store(entry, 1, INT2NUM( pos->pos ));
+
+      rb_ary_push(query_raw, entry);
+
       if (pos->next == NULL)
         break;
 
@@ -80,7 +88,7 @@ VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
     }
   }
 
-  return Qtrue;
+  return query_raw;
 }
 
 int duple_id(int c_a, int c_b) {
