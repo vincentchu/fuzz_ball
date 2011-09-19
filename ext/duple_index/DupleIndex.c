@@ -29,12 +29,31 @@ VALUE method_alloc_index(VALUE self) {
   return Data_Wrap_Struct(self, NULL, method_free_index, duples);
 }
 
-VALUE method_free_index(VALUE self) {
-  printf("\n\n**** method_free_index\n");
+/* VALUE method_free_index(struct duple_hash *duples) {*/
+/*   printf("\n\n**** method_free_index\n");*/
 
-  printf("malloc called %d times\n", n_malloc_calls);
-  printf("free   called %d times\n", n_free_calls);
-}
+/*   struct duple_hash *d, *d_tmp;*/
+
+
+/*   [> HASH_ITER(hh, duples, d, d_tmp) {<]*/
+/*   [>   printf("Freeing hash id = %d\n", d->id);<]*/
+
+/*     [> destroy_duple_pos(d->strings);<]*/
+
+/*     [> HASH_DEL(duples, d);<]*/
+/*     [> n_free_calls++;<]*/
+/*     [> free(d);<]*/
+/*   [> }<]*/
+
+
+
+
+
+/*   printf("malloc called %d times\n", n_malloc_calls);*/
+/*   printf("free   called %d times\n", n_free_calls);*/
+
+/*   return Qnil;*/
+/* }*/
 
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   printf("\n\n**** method_add\n");

@@ -25,7 +25,7 @@ VALUE DupleIndex = Qnil;
 
 void Init_duple_index();
 VALUE method_alloc_index(VALUE self);
-VALUE method_free_index(VALUE self);
+VALUE method_free_index(struct duple_hash *duples);
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str);
 VALUE method_query(VALUE self, VALUE r_a, VALUE r_b);
 
