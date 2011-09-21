@@ -14,12 +14,10 @@ void Init_duple_index() {
 }
 
 VALUE method_alloc_index(VALUE self) {
-  printf("\n\n**** method_alloc_index\n");
   struct duples_hash *duples, *ptr;
 
   // Initialize the hash with a single, hidden entry so that
   // the *duples pointer doesn't point to NULL
-  n_malloc_calls++;
   ptr          = malloc(sizeof(struct duples_hash));
   ptr->id      = duple_id(-1, -1);
   ptr->strings = create_duple_pos(-1, -1, NULL, NULL);
@@ -30,27 +28,19 @@ VALUE method_alloc_index(VALUE self) {
 }
 
 static void method_free_index(void *duples) {
-  printf("\n\n**** method_free_index\n");
   destroy_index( duples );
 }
 
 void destroy_index(struct duples_hash *duples) {
-  printf("\n\n**** destroy_index\n");
-
   struct duples_hash *d, *d_tmp;
 
   HASH_ITER(hh, duples, d, d_tmp) {
-    printf("Freeing hash id = %d\n", d->id);
 
     destroy_duple_pos(d->strings);
 
     HASH_DEL(duples, d);
-    n_free_calls++;
     free(d);
   }
-
-  printf("malloc called %d times\n", n_malloc_calls);
-  printf("free   called %d times\n", n_free_calls);
 }
 
 void destroy_duple_pos(struct duple_pos *head) {
@@ -60,7 +50,6 @@ void destroy_duple_pos(struct duple_pos *head) {
 
   while (1) {
     n_pos = c_pos->next;
-    n_free_calls++;
     free(c_pos);
 
     if (n_pos == NULL) {
@@ -73,7 +62,6 @@ void destroy_duple_pos(struct duple_pos *head) {
 
 
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
-  printf("\n\n**** method_add\n");
   int i, str_id, str_len, c_a, c_b;
   struct duples_hash *duples;
 
@@ -91,7 +79,6 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
 }
 
 VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
-  printf("\n\n**** method_query\n");
   struct duples_hash *duples, *ptr;
   struct duple_pos *pos;
   int c_a, c_b;
@@ -108,9 +95,6 @@ VALUE method_query(VALUE self, VALUE r_a, VALUE r_b) {
     pos = ptr->strings;
 
      while(1) {
-
-      printf("duple (%3d, %3d) found in string %5d at position %5d\n", c_a, c_b, pos->index, pos->pos);
-
       entry = rb_ary_new2(2);
       rb_ary_store(entry, 0, INT2NUM( pos->index ));
       rb_ary_store(entry, 1, INT2NUM( pos->pos ));
@@ -147,9 +131,6 @@ void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos)
 
   ptr = duple_at(duples, c_a, c_b);
   if (ptr == NULL) {
-    printf("duple %5d (%3d, %3d) MISS!\n", duple_id(c_a, c_b), c_a, c_b);
-
-    n_malloc_calls++;
     ptr          = malloc(sizeof(struct duples_hash));
     ptr->id      = duple_id(c_a, c_b);
     ptr->strings = create_duple_pos(index, pos, NULL, NULL);
@@ -157,8 +138,6 @@ void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos)
     HASH_ADD_INT(duples, id, ptr);
 
   } else {
-    printf("duple %5d (%3d, %3d)  HIT!\n", duple_id(c_a, c_b), c_a, c_b);
-
     d_pos              = create_duple_pos(index, pos, ptr->strings, NULL);
     ptr->strings->prev = d_pos;
     ptr->strings       = d_pos;
@@ -168,7 +147,6 @@ void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos)
 struct duple_pos *create_duple_pos(int index, int pos, struct duple_pos *next, struct duple_pos *prev) {
   struct duple_pos *ptr;
 
-  n_malloc_calls++;
   ptr = malloc( sizeof(struct duple_pos) );
 
   ptr->index = index;

@@ -1,9 +1,4 @@
 #define MAX_CHARS 1000
-// Prototype some shit
-
-// TEST globals
-int n_malloc_calls = 0;
-int n_free_calls   = 0;
 
 struct duple_pos {
   int index;
