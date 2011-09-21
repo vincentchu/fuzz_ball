@@ -25,7 +25,7 @@ VALUE DupleIndex = Qnil;
 
 void Init_duple_index();
 VALUE method_alloc_index(VALUE self);
-VALUE method_free_index(struct duple_hash *duples);
+static void method_free_index(void *duples);
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str);
 VALUE method_query(VALUE self, VALUE r_a, VALUE r_b);
 
@@ -34,3 +34,5 @@ void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos)
 struct duples_hash *duple_at(struct duples_hash *duples, int c_a, int c_b);
 int duple_id(int c_a, int c_b);
 struct duple_pos *create_duple_pos(int index, int pos, struct duple_pos *next, struct duple_pos *prev);
+void destroy_index(struct duples_hash *duples);
+void destroy_duple_pos(struct duple_pos *head);

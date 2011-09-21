@@ -29,31 +29,48 @@ VALUE method_alloc_index(VALUE self) {
   return Data_Wrap_Struct(self, NULL, method_free_index, duples);
 }
 
-/* VALUE method_free_index(struct duple_hash *duples) {*/
-/*   printf("\n\n**** method_free_index\n");*/
+static void method_free_index(void *duples) {
+  printf("\n\n**** method_free_index\n");
+  destroy_index( duples );
+}
 
-/*   struct duple_hash *d, *d_tmp;*/
+void destroy_index(struct duples_hash *duples) {
+  printf("\n\n**** destroy_index\n");
 
+  struct duples_hash *d, *d_tmp;
 
-/*   [> HASH_ITER(hh, duples, d, d_tmp) {<]*/
-/*   [>   printf("Freeing hash id = %d\n", d->id);<]*/
+  HASH_ITER(hh, duples, d, d_tmp) {
+    printf("Freeing hash id = %d\n", d->id);
 
-/*     [> destroy_duple_pos(d->strings);<]*/
+    destroy_duple_pos(d->strings);
 
-/*     [> HASH_DEL(duples, d);<]*/
-/*     [> n_free_calls++;<]*/
-/*     [> free(d);<]*/
-/*   [> }<]*/
+    HASH_DEL(duples, d);
+    n_free_calls++;
+    free(d);
+  }
 
+  printf("malloc called %d times\n", n_malloc_calls);
+  printf("free   called %d times\n", n_free_calls);
+}
 
+void destroy_duple_pos(struct duple_pos *head) {
+  struct duple_pos *c_pos, *n_pos;
 
+  c_pos = head;
 
+  while (1) {
+    n_pos = c_pos->next;
+    n_free_calls++;
+    free(c_pos);
 
-/*   printf("malloc called %d times\n", n_malloc_calls);*/
-/*   printf("free   called %d times\n", n_free_calls);*/
+    if (n_pos == NULL) {
+      break;
+    } else {
+      c_pos = n_pos;
+    }
+  }
+}
 
-/*   return Qnil;*/
-/* }*/
 
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   printf("\n\n**** method_add\n");
