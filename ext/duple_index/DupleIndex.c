@@ -35,7 +35,6 @@ void destroy_index(struct duples_hash *duples) {
   struct duples_hash *d, *d_tmp;
 
   HASH_ITER(hh, duples, d, d_tmp) {
-
     destroy_duple_pos(d->strings);
 
     HASH_DEL(duples, d);
@@ -59,7 +58,6 @@ void destroy_duple_pos(struct duple_pos *head) {
     }
   }
 }
-
 
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   int i, str_id, str_len, c_a, c_b;
@@ -156,5 +154,4 @@ struct duple_pos *create_duple_pos(int index, int pos, struct duple_pos *next, s
 
   return ptr;
 }
-
 
