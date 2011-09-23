@@ -5,6 +5,7 @@ describe FuzzBall::Searcher do
   before(:all) do
     @fuzz = FuzzBall::Searcher.new(["aaa", "bbb"])
     @aaa_array = "aaa".unpack("U*")
+    @bbb_array = "bbb".unpack("U*")
   end
 
   describe "#initialize" do
@@ -13,7 +14,7 @@ describe FuzzBall::Searcher do
     end
 
     it "should convert the list of files into their array representations" do
-      @fuzz.files_array.should == ["aaa".unpack("U*"), "bbb".unpack("U*")]
+      @fuzz.files_array.should == [@aaa_array, @bbb_array]
     end
 
     it "should weed out characters that are designated to be ignored" do
@@ -29,6 +30,21 @@ describe FuzzBall::Searcher do
 			FuzzBall::Searcher.new(["aaa"])
 		end
   end
+
+	describe "#decimate_strings!" do
+		before(:each) do 
+			@duple_index = mock('duple_index')
+			@fuzz.stub!(:duple_index).and_return(@duple_index)
+		end
+
+		 it "should use the duple index to find weed out non-matching strings" do
+			 @duple_index.should_receive(:match).once.with(
+				 @aaa_array, :by_score => true
+       ).and_return({2 => [0]})
+
+       @fuzz.send(:decimate_strings!, @aaa_array).should == [@aaa_array]
+		end
+	end
 
   # describe "#search" do
   #   it "should only search the candidate strings that have the highest duples" do

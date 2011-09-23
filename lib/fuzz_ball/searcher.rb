@@ -45,18 +45,11 @@ module FuzzBall
 		end
 
     def decimate_strings!(needle)
-      max_duples = -1
-      grouped_results = {}
+			matches_by_score = duple_index.match(needle, :by_score => true)
+			max_score        = matches_by_score.keys.max
+			indices          = matches_by_score[max_score]
 
-      files_array.each do |haystack|
-        n_duples   = count_duples(needle, haystack)
-        max_duples = n_duples if (n_duples > max_duples)
-
-        grouped_results[n_duples] ||= []
-        grouped_results[n_duples] << haystack
-      end
-
-      grouped_results[max_duples]
+			files_array.values_at(*indices)
     end
 
     def str2arr( str )
