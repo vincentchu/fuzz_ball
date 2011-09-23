@@ -20,6 +20,14 @@ describe FuzzBall::Searcher do
       fuzz = FuzzBall::Searcher.new(["path/to/file.txt"], :ignore => %w(. /))
       fuzz.files_array.should == ["pathtofiletxt".unpack("U*")]
     end
+
+		it "should properly instantiate a duple index" do
+			@duple_mock = mock('duple_index')
+			FuzzBall::DupleIndex.should_receive(:new).once.and_return(@duple_mock)
+			@duple_mock.should_receive(:add).once
+
+			FuzzBall::Searcher.new(["aaa"])
+		end
   end
 
   # describe "#search" do

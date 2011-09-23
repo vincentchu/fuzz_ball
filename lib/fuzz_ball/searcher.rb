@@ -1,15 +1,15 @@
 module FuzzBall
   class Searcher
 
-    attr_reader :files, :files_array, :options
+    attr_reader :files, :files_array, :options, :duple_index
 
     def initialize(files, opts = {})
       @options     = opts
       @files       = files
       @files_array = files.collect {|f| str2arr(f)}
 
-      @curr_alignment = []
-      @curr_score     = 0.0
+			@duple_index = DupleIndex.new
+			index_duples!
     end
 
     def search(needle, opts = {})
@@ -37,6 +37,12 @@ module FuzzBall
     end
 
     private
+
+		def index_duples!
+			files_array.each_with_index do |str, index|
+				duple_index.add(index, str)
+			end
+		end
 
     def decimate_strings!(needle)
       max_duples = -1
