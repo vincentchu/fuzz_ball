@@ -20,9 +20,13 @@ module FuzzBall
       return results if (needle.length < 2)
 
       decimate_strings!( needle_ary ).each do |candidate|
-        smith_waterman(needle_ary, candidate)
+        smith = SmithWaterman.new(needle_ary, candidate)
 
-        results << {:alignment => @curr_alignment, :score => @curr_score, :string => candidate.pack("U*")}
+        results << {
+          :alignment => smith.alignment,
+          :score     => smith.score,
+          :string    => candidate.pack("U*")
+        }
       end
 
       if (opts[:order] == :descending)

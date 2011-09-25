@@ -46,47 +46,25 @@ describe FuzzBall::Searcher do
 		end
 	end
 
-  # describe "#search" do
-  #   it "should only search the candidate strings that have the highest duples" do
-  #     @fuzz.should_receive(:decimate_strings!).once.with( @aaa_array ).and_return([@aaa_array])
-  #     @fuzz.should_receive(:smith_waterman).once.with(@aaa_array, @aaa_array)
-  #     @fuzz.search("aaa")
-  #   end
+  describe "#search" do
+    before(:each) do
+      @smith_waterman_mock = mock('smith_waterman')
+    end
 
-  #   it "should be fine when presented with malformed input (e.g., blank string)" do
-  #     lambda {
-  #       @fuzz.search("")
-  #     }.should_not raise_exception
-  #   end
-  # end
+    it "should be fine when presented with malformed input (e.g., blank string)" do
+      lambda {
+        @fuzz.search("")
+      }.should_not raise_exception
+    end
 
-  # describe "#decimate_strings!" do
-  #   it "should remove strings that don't have a high duple count" do
-  #     @fuzz.send(:decimate_strings!, @aaa_array).should == [@aaa_array]
-  #   end
-  # end
+    it "should only search the candidate strings that have the highest duples" do
+      @fuzz.should_receive(:decimate_strings!).once.with( @aaa_array ).and_return([@aaa_array])
+      FuzzBall::SmithWaterman.should_receive(:new).once.with(@aaa_array, @aaa_array).and_return( @smith_waterman_mock )
+      @smith_waterman_mock.should_receive(:alignment).once.and_return([1, 2, 3])
+      @smith_waterman_mock.should_receive(:score).once.and_return(2.0)
 
-  describe "Array utilities" do
-    # describe "#count_duples" do
-    #   it "should return the number of continuous duples between two arrays" do
-    #     [
-    #       [[1,2], [1,3], 0],
-    #       [[1,2,3], [5,6,1,2,3,4], 2],
-    #       [[1,2], [1,2], 1],
-    #       [[1,2,3], [1,2], 1]
-    #     ].each do |test_case|
-    #       @fuzz.send(:count_duples, test_case[0], test_case[1]).should == test_case[2]
-    #     end
-    #   end
-    # end
-
-    # describe "#smith_waterman" do
-    #   it "should align the two strings" do
-    #     @fuzz.send(:smith_waterman, [1,2,3], [2,3,4])
-    #     @fuzz.instance_eval { @curr_alignment }.should == [2, 1, 1, 0]
-    #     @fuzz.instance_eval { @curr_score }.should == 2.0
-    #   end
-    # end
+      @fuzz.search("aaa")
+    end
   end
 
   describe "String utilities" do
