@@ -8,7 +8,6 @@ module FuzzBall
       @files       = files
       @files_array = files.collect {|f| str2arr(f)}
 
-			@duple_index = DupleIndex.new
 			index_duples!
     end
 
@@ -24,7 +23,7 @@ module FuzzBall
 
         results << {
           :alignment => smith.alignment,
-          :score     => smith.score,
+          :score     => (smith.score / candidate.length), # normalize by string length; this favors shorter strings even if a longer string has a higher smith score
           :string    => candidate.pack("U*")
         }
       end
@@ -41,12 +40,13 @@ module FuzzBall
     end
 
     def inspect
-      %Q[<FuzzBall::Searcher>]
+      %Q[<FuzzBall::Searcher n_files=#{files_array.count}>]
     end
 
     private
 
 		def index_duples!
+			@duple_index = DupleIndex.new
 			files_array.each_with_index do |str, index|
 				duple_index.add(index, str)
 			end
