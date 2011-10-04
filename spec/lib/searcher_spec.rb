@@ -6,6 +6,7 @@ describe FuzzBall::Searcher do
     @fuzz = FuzzBall::Searcher.new(["aaa", "bbb"])
     @aaa_array = "aaa".unpack("U*")
     @bbb_array = "bbb".unpack("U*")
+    @ccc_array = "ccc".unpack("U*")
   end
 
   describe "#initialize" do
@@ -31,8 +32,23 @@ describe FuzzBall::Searcher do
 		end
   end
 
+  describe "#add" do
+    before(:each) do
+      @duple_mock = mock('duple_index')
+      @fuzz.stub!(:duple_index).and_return( @duple_mock )
+    end
+
+    it "should allow you to add a string for searching" do
+      @duple_mock.should_receive(:add).once.with( 2, @ccc_array )
+      @fuzz.add("ccc")
+
+      @fuzz.files.last.should       == "ccc"
+      @fuzz.files_array.last.should == @ccc_array
+    end
+  end
+
 	describe "#decimate_strings!" do
-		before(:each) do 
+		before(:each) do
 			@duple_index = mock('duple_index')
 			@fuzz.stub!(:duple_index).and_return(@duple_index)
 		end

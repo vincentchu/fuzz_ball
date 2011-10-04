@@ -11,6 +11,17 @@ module FuzzBall
 			index_duples!
     end
 
+    def add( str )
+      str_arr = str2arr( str )
+
+      files       << str
+      files_array << str_arr
+
+      duple_index.add( files_array.count - 1, str_arr )
+
+      true
+    end
+
     def search(needle, opts = {})
 
       needle_ary = str2arr(needle)
