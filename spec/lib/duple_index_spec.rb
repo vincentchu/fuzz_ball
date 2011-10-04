@@ -13,32 +13,17 @@ describe FuzzBall::DupleIndex do
     end
   end
 
-  describe "#query" do
-    before(:each) do
-      @index.add(0, [1, 2, 3]);
-      @index.add(1, [0, 1, 2]);
-    end
-
-    it "should tell you where a given duple is found" do
-      @index.query(1, 2).should == [[1, 1], [0, 0]]
-    end
-  end
-
   describe "#match" do
     before(:each) do
-      @index.add(0, [1, 2, 3, 4])
-      @index.add(1, [1, 2, 3])
-      @index.add(2, [1, 2, 4])
-      @index.add(3, [4, 5])
-      @index.add(4, [10, 11, 10, 11])
-    end
-
-    it "should do crap" do
-      @index.match([1, 2, 3, 5])
-    end
-
-    it "should do more crap" do
-      @index.match([10, 11])
+      [
+        [1, 2, 3, 4],
+        [1, 2, 3],
+        [1, 2, 4],
+        [4, 5],
+        [10, 11, 10, 11]
+      ].each_with_index do |string, i|
+        @index.add(i, string)
+      end
     end
 
     it "should not attempt to match with one or fewer duples in the candidate" do
@@ -47,6 +32,10 @@ describe FuzzBall::DupleIndex do
 
     it "should return strings by score" do
       @index.match([1, 2, 3]).should == {2 => [1, 0], 1 => [2]}
+    end
+
+    it "shouldn't be fooled by the appearance of multiple duples in a string" do
+      @index.match([10, 11]).should == {1 => [4]}
     end
   end
 end

@@ -39,7 +39,7 @@ describe FuzzBall::Searcher do
 
 		 it "should use the duple index to find weed out non-matching strings" do
 			 @duple_index.should_receive(:match).once.with(
-				 @aaa_array, :by_score => true
+				 @aaa_array
        ).and_return({2 => [0]})
 
        @fuzz.send(:decimate_strings!, @aaa_array).should == [@aaa_array]

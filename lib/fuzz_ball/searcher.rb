@@ -53,7 +53,7 @@ module FuzzBall
 		end
 
     def decimate_strings!(needle)
-			matches_by_score = duple_index.match(needle, :by_score => true)
+			matches_by_score = duple_index.match(needle)
 			max_score        = matches_by_score.keys.max
 			indices          = matches_by_score[max_score]
 
