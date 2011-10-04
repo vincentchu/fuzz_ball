@@ -76,6 +76,27 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   return Qtrue;
 }
 
+struct match *create_match(int id, int pos, int c_a, int c_b) {
+  struct match *new_match;
+
+  new_match = malloc( sizeof(struct match) );
+
+  new_match->id                    = id;
+  new_match->n_matches             = 1;
+  new_match->last_matched_position = pos;
+  new_match->last_matched_ca       = c_a;
+  new_match->last_matched_cb       = c_b;
+
+  return new_match;
+}
+
+void update_match(struct match* match, int pos, int c_a, int c_b) {
+  match->n_matches++;
+  match->last_matched_position = pos;
+  match->last_matched_ca       = c_a;
+  match->last_matched_cb       = c_b;
+}
+
 VALUE method_match(VALUE self, VALUE needle) {
 
   int i, n_needle, c_a, c_b, match_id;
@@ -109,22 +130,12 @@ VALUE method_match(VALUE self, VALUE needle) {
         HASH_FIND_INT(matches, &match_id, match);
 
         if (match == NULL) {
-          match = malloc( sizeof(struct match) );
-
-          match->id = match_id;
-          match->n_matches = 1;
-          match->last_matched_position = pos->pos;
-          match->last_matched_ca = c_a;
-          match->last_matched_cb = c_b;
-
+          match = create_match(match_id, pos->pos, c_a, c_b);
           HASH_ADD_INT(matches, id, match);
 
         } else {
           if ((match->last_matched_position < pos->pos) && (match->last_matched_ca != c_a) && (match->last_matched_cb != c_b)) {
-            match->n_matches++;
-            match->last_matched_position = pos->pos;
-            match->last_matched_ca = c_a;
-            match->last_matched_cb = c_b;
+            update_match( match, pos->pos, c_a, c_b );
           }
         }
 
@@ -144,6 +155,7 @@ VALUE method_match(VALUE self, VALUE needle) {
 
     rb_ary_push(arr, INT2NUM(match->id));
     rb_hash_aset(matches_by_score, INT2NUM(match->n_matches), arr);
+
     HASH_DEL(matches, match);
     free(match);
   }

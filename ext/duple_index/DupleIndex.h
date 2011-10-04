@@ -41,3 +41,5 @@ int duple_id(int c_a, int c_b);
 struct duple_pos *create_duple_pos(int index, int pos, struct duple_pos *next, struct duple_pos *prev);
 void destroy_index(struct duples_hash *duples);
 void destroy_duple_pos(struct duple_pos *head);
+struct match *create_match(int id, int pos, int c_a, int c_b);
+void update_match(struct match* match, int pos, int c_a, int c_b);
