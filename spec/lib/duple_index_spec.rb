@@ -30,18 +30,23 @@ describe FuzzBall::DupleIndex do
       @index.add(1, [1, 2, 3])
       @index.add(2, [1, 2, 4])
       @index.add(3, [4, 5])
+      @index.add(4, [10, 11, 10, 11])
+    end
+
+    it "should do crap" do
+      @index.match([1, 2, 3, 5])
+    end
+
+    it "should do more crap" do
+      @index.match([10, 11])
     end
 
     it "should not attempt to match with one or fewer duples in the candidate" do
       @index.match([1]).should == {}
     end
 
-    it "should return strings that match candidate by score" do
-      @index.match([1, 2, 3]).should == { 0 => 2, 1 => 2, 2 => 1 }
-    end
-
     it "should return strings by score" do
-      @index.match([1, 2, 3], :by_score => true).should == {2 => [1, 0], 1 => [2]}
+      @index.match([1, 2, 3]).should == {2 => [1, 0], 1 => [2]}
     end
   end
 end

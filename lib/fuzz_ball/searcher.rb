@@ -40,6 +40,10 @@ module FuzzBall
       results
     end
 
+    def inspect
+      %Q[<FuzzBall::Searcher>]
+    end
+
     private
 
 		def index_duples!

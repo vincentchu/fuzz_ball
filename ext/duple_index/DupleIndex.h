@@ -14,6 +14,16 @@ struct duples_hash {
   UT_hash_handle hh;
 };
 
+struct match {
+  int id;
+  int n_matches;
+  int last_matched_position;
+  int last_matched_ca;
+  int last_matched_cb;
+
+  UT_hash_handle hh;
+};
+
 // Ruby-related declarations
 VALUE FuzzBall   = Qnil;
 VALUE DupleIndex = Qnil;
@@ -23,6 +33,7 @@ VALUE method_alloc_index(VALUE self);
 static void method_free_index(void *duples);
 VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str);
 VALUE method_query(VALUE self, VALUE r_a, VALUE r_b);
+VALUE method_match(VALUE self, VALUE needle);
 
 // Internally-used C-declarations
 void add_duple(struct duples_hash *duples, int c_a, int c_b, int index, int pos);
