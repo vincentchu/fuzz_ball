@@ -23,13 +23,13 @@ describe FuzzBall::Searcher do
       fuzz.files_array.should == ["pathtofiletxt".unpack("U*")]
     end
 
-		it "should properly instantiate a duple index" do
-			@duple_mock = mock('duple_index')
-			FuzzBall::DupleIndex.should_receive(:new).once.and_return(@duple_mock)
-			@duple_mock.should_receive(:add).once
+    it "should properly instantiate a duple index" do
+      @duple_mock = mock('duple_index')
+      FuzzBall::DupleIndex.should_receive(:new).once.and_return(@duple_mock)
+      @duple_mock.should_receive(:add).once
 
-			FuzzBall::Searcher.new(["aaa"])
-		end
+      FuzzBall::Searcher.new(["aaa"])
+    end
   end
 
   describe "#add" do
@@ -47,20 +47,20 @@ describe FuzzBall::Searcher do
     end
   end
 
-	describe "#decimate_strings!" do
-		before(:each) do
-			@duple_index = mock('duple_index')
-			@fuzz.stub!(:duple_index).and_return(@duple_index)
-		end
+  describe "#decimate_strings!" do
+    before(:each) do
+      @duple_index = mock('duple_index')
+      @fuzz.stub!(:duple_index).and_return(@duple_index)
+    end
 
-		 it "should use the duple index to find weed out non-matching strings" do
-			 @duple_index.should_receive(:match).once.with(
-				 @aaa_array
+    it "should use the duple index to find weed out non-matching strings" do
+      @duple_index.should_receive(:match).once.with(
+        @aaa_array
        ).and_return({2 => [0]})
 
        @fuzz.send(:decimate_strings!, @aaa_array).should == [@aaa_array]
-		end
-	end
+    end
+  end
 
   describe "#search" do
     before(:each) do
