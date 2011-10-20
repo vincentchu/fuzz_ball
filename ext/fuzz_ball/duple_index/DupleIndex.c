@@ -223,7 +223,7 @@ VALUE method_match(VALUE self, VALUE needle) {
            * duple to match since it appears before 'ab' in the indexed string,
            * whereas it appears after in the needle string.
            */
-          if ((match->last_matched_position < pos->pos) && (match->last_matched_ca != c_a) && (match->last_matched_cb != c_b)) {
+          if ((match->last_matched_position < pos->pos)) { // && (match->last_matched_ca != c_a) && (match->last_matched_cb != c_b)) {
             update_match( match, pos->pos, c_a, c_b );
           }
         }
@@ -268,7 +268,13 @@ struct match *create_match(int id, int pos, int c_a, int c_b) {
 }
 
 void update_match(struct match* match, int pos, int c_a, int c_b) {
-  match->n_matches++;
+
+  if (match->last_matched_position == pos-1) {
+    match->n_matches += 2;
+  } else {
+    match->n_matches++;
+  }
+
   match->last_matched_position = pos;
   match->last_matched_ca       = c_a;
   match->last_matched_cb       = c_b;

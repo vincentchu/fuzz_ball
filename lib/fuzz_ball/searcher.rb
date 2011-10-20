@@ -8,7 +8,7 @@ module FuzzBall
       @files       = files
       @files_array = files.collect {|f| str2arr(f)}
 
-			index_duples!
+      index_duples!
     end
 
     def add( str )
@@ -56,19 +56,20 @@ module FuzzBall
 
     private
 
-		def index_duples!
-			@duple_index = DupleIndex.new
-			files_array.each_with_index do |str, index|
-				duple_index.add(index, str)
-			end
-		end
+    def index_duples!
+      @duple_index = DupleIndex.new
+      files_array.each_with_index do |str, index|
+        duple_index.add(index, str)
+      end
+    end
 
     def decimate_strings!(needle)
-			matches_by_score = duple_index.match(needle)
-			max_score        = matches_by_score.keys.max
-			indices          = matches_by_score[max_score]
+      matches_by_score = duple_index.match(needle)
 
-			files_array.values_at(*indices)
+      max_keys = matches_by_score.keys.sort.last(2)
+      indices  = matches_by_score.values_at(*max_keys).flatten
+
+      files_array.values_at(*indices)
     end
 
     def str2arr( str )

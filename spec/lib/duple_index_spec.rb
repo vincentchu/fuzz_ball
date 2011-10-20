@@ -31,7 +31,7 @@ describe FuzzBall::DupleIndex do
     end
 
     it "should return strings by score" do
-      @index.match([1, 2, 3]).should == {2 => [1, 0], 1 => [2]}
+      @index.match([1, 2, 3]).should == {3 => [1, 0], 1 => [2]}
     end
 
     it "shouldn't be fooled by the appearance of multiple duples in a string" do
