@@ -1,6 +1,8 @@
 module FuzzBall
   class Searcher
 
+    DECIMATE_LIMIT = 10
+
     attr_reader :files, :files_array, :options, :duple_index
 
     def initialize(files, opts = {})
@@ -34,7 +36,7 @@ module FuzzBall
 
         results << {
           :alignment => smith.alignment,
-          :score     => (smith.score / candidate.length), # normalize by string length; this favors shorter strings even if a longer string has a higher smith score
+          :score     => (smith.score - 0.01*candidate.length), # penalize against longer strings
           :string    => candidate.pack("U*")
         }
       end
@@ -66,8 +68,14 @@ module FuzzBall
     def decimate_strings!(needle)
       matches_by_score = duple_index.match(needle)
 
-      max_keys = matches_by_score.keys.sort.last(2)
-      indices  = matches_by_score.values_at(*max_keys).flatten
+      indices = []
+      matches_by_score.keys.sort { |a,b| b <=> a}.each do |key|
+        if (indices.length < DECIMATE_LIMIT)
+          indices += matches_by_score[key]
+        else
+          break
+        end
+      end
 
       files_array.values_at(*indices)
     end

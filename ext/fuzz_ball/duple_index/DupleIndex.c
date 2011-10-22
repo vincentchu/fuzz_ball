@@ -99,7 +99,7 @@ VALUE method_add(VALUE self, VALUE r_str_id, VALUE r_str) {
   str_len = (int) RARRAY_LEN(r_str);
   str_id  = NUM2INT( r_str_id );
 
-  for (i=0; i<(str_len-1); i++) {
+  for (i=(str_len-2); i>=0; i--) {
     c_a = NUM2INT( RARRAY_PTR(r_str)[i] );
     c_b = NUM2INT( RARRAY_PTR(r_str)[i+1] );
     add_duple(duples, c_a, c_b, str_id, i);

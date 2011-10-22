@@ -35,7 +35,7 @@ describe FuzzBall::DupleIndex do
     end
 
     it "shouldn't be fooled by the appearance of multiple duples in a string" do
-      @index.match([10, 11]).should == {1 => [4]}
+      @index.match([10, 11]).should == {2 => [4]}
     end
   end
 end
